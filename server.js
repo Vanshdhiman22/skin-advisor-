@@ -215,15 +215,16 @@ ${catalogText(category)}`;
     const text = await callGroq(TEXT_MODEL, [{ role: "system", content: system }, { role: "user", content: userMsg }], { max_tokens: 2000 });
     const p = safeParse(text);
     if (!p) return res.json(fallbackConsult(category, answers, detected, f, flagPro));
+    const fb = fallbackConsult(category, answers, detected, f, flagPro); // rule-based base to fill any gaps
     const { groups, products: flat } = hydrateGroups(p.routine, category);
-    const safeGroups = groups.length ? groups : hydrateGroups(buildRoutine(category, f), category).groups;
+    const hasProfile = p.profile && p.profile.type;
     return res.json({
-      profile: p.profile || null,
-      snapshot: Array.isArray(p.snapshot) && p.snapshot.length ? p.snapshot : buildSnapshot(category, f),
-      summary: p.summary || "",
-      routine: safeGroups,
-      products: flat.length ? flat : hydrateGroups(buildRoutine(category, f), category).products,
-      lifestyle: Array.isArray(p.lifestyle) ? p.lifestyle : [],
+      profile: hasProfile ? { type: p.profile.type, tags: Array.isArray(p.profile.tags) && p.profile.tags.length ? p.profile.tags : fb.profile.tags } : fb.profile,
+      snapshot: Array.isArray(p.snapshot) && p.snapshot.length ? p.snapshot : fb.snapshot,
+      summary: p.summary && p.summary.trim() ? p.summary : fb.summary,
+      routine: groups.length ? groups : fb.routine,
+      products: flat.length ? flat : fb.products,
+      lifestyle: Array.isArray(p.lifestyle) && p.lifestyle.length ? p.lifestyle : fb.lifestyle,
       seeProfessional: p.seeProfessional || (flagPro ? proSentence(category) : ""),
       language
     });
