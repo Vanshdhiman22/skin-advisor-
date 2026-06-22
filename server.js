@@ -286,7 +286,7 @@ app.post("/api/lead", (req, res) => {
     at: new Date().toISOString(),
     category: b.category === "hair" ? "hair" : "face",
     name: (b.name || "").toString().slice(0, 80),
-    age: (b.age || "").toString().slice(0, 4),
+    age: (b.age || "").toString().slice(0, 16),
     phone: (b.phone || "").toString().slice(0, 24),
     email: email.slice(0, 160),
     profile: b.profile && b.profile.type ? String(b.profile.type).slice(0, 120) : "",

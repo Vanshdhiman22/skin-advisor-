@@ -96,7 +96,7 @@
         var when = new Date(l.at).toLocaleString();
         var prods = (l.products || []).map(function(p){ return '<span class="tag">' + esc(p) + "</span>"; }).join(" ");
         var contact = '<span class="email">' + esc(l.name || "—") + "</span>" +
-          (l.age ? " · " + esc(l.age) + "y" : "") +
+          (l.age ? " · " + esc(l.age) : "") +
           (l.phone ? "<br><span class='muted'>" + esc(l.phone) + "</span>" : "") +
           "<br><span class='muted'>" + esc(l.email) + "</span>";
         return "<tr>" +

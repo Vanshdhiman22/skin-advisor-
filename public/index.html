@@ -47,23 +47,20 @@
       </div>
     </section>
 
-    <!-- SCAN (optional) -->
+    <!-- PHOTO (optional upload) -->
     <section class="view view-scan" id="view-scan" hidden>
       <button class="back" id="scan-back" type="button">← Back</button>
       <h2 class="scan-title">Last step — add a photo (optional)</h2>
-      <p class="scan-hint">Your photo just appears on your result — the advice itself comes from your answers. Add one, or skip to see your plan.</p>
-      <div class="camera">
-        <video id="video" playsinline muted></video>
-        <div class="reticle" aria-hidden="true"></div>
-        <div class="scanline" id="scanline" aria-hidden="true"></div>
-        <div class="camera-msg" id="camera-msg" hidden></div>
+      <p class="scan-hint">Add a photo to keep with your result if you like. Your plan comes from your answers either way — the photo is just for your profile.</p>
+      <div class="upload-box" id="upload-box">
+        <img id="upload-preview" class="upload-preview" alt="Your photo" hidden />
+        <div class="upload-placeholder" id="upload-placeholder">No photo added</div>
       </div>
       <canvas id="canvas" hidden></canvas>
-      <button class="primary-btn" id="capture-btn" type="button">Add photo &amp; see my plan</button>
       <input type="file" id="upload-input" accept="image/*" hidden />
-      <button class="primary-btn ghost" id="upload-photo" type="button">⤒ Upload a photo instead</button>
-      <button class="link-quiet" id="skip-scan" type="button">Skip &amp; see my plan →</button>
-      <p class="privacy">🔒 Your photo isn't saved anywhere.</p>
+      <button class="primary-btn ghost" id="upload-photo" type="button">⤒ Upload a photo</button>
+      <button class="primary-btn" id="capture-btn" type="button">See my plan →</button>
+      <p class="privacy">🔒 Your photo isn't saved on our servers.</p>
     </section>
 
     <!-- INTAKE -->
@@ -127,10 +124,8 @@
 
       <div class="lead" id="lead">
         <div id="lead-form">
-          <h3 class="section-h">Save your routine &amp; get tips</h3>
-          <p class="lead-sub">Pop in your details and we'll send your routine and check in on your progress.</p>
-          <input class="lead-input" id="lead-name" type="text" placeholder="First name" autocomplete="given-name" />
-          <input class="lead-input" id="lead-age" type="number" inputmode="numeric" min="1" max="120" placeholder="Age" />
+          <h3 class="section-h">Get your routine &amp; tips</h3>
+          <p class="lead-sub">Add your contact so we can send your routine and check in on your progress.</p>
           <input class="lead-input" id="lead-phone" type="tel" inputmode="tel" placeholder="Phone number" autocomplete="tel" />
           <input class="lead-input" id="lead-email" type="email" placeholder="you@email.com" autocomplete="email" />
           <label class="lead-consent"><input type="checkbox" id="lead-consent" /> <span>I'm happy for my details to be saved and to be contacted about my routine and products.</span></label>
