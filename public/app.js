@@ -79,7 +79,7 @@
     if (stepLabel) body.appendChild(el("span", "rec-step", stepLabel));
     const name = el("div", "rec-name");
     name.appendChild(el("span", null, product.name));
-    name.appendChild(el("span", "rec-price", "$" + product.price));
+    name.appendChild(el("span", "rec-price", inr(product.price)));
     body.appendChild(name);
     body.appendChild(el("div", "rec-why", product.blurb));
     if (product.keyIngredient) {
@@ -254,11 +254,106 @@
       routine.appendChild(block);
     });
 
+    renderExtras(data);
+
     const life = $("lifestyle"), list = $("lifestyle-list");
     if (data.lifestyle && data.lifestyle.length) { life.hidden = false; list.innerHTML = ""; data.lifestyle.forEach((t) => list.appendChild(el("li", null, t))); }
     else life.hidden = true;
 
     show("result");
+  }
+
+  // ---- honest, generic content for the new sections (no fake stats / no drugs) ----
+  const TIMELINE = {
+    face: [
+      { when: "Week 1–2", head: "Skin settles in", body: "Your skin adjusts to the new routine. A little dryness early on is normal." },
+      { when: "Week 3–4", head: "Barrier feels better", body: "Hydration and texture start to improve. Keep going daily." },
+      { when: "Month 2", head: "Tone evens out", body: "Marks and unevenness begin to soften with consistent use." },
+      { when: "Month 3+", head: "Visible difference", body: "Clearer, smoother, more balanced skin — where consistency pays off." }
+    ],
+    hair: [
+      { when: "Week 1–2", head: "Scalp resets", body: "Your scalp adjusts to the routine. Wash and treat as guided." },
+      { when: "Week 3–6", head: "Less shedding", body: "Daily shedding starts to settle as the scalp gets healthier." },
+      { when: "Month 2–3", head: "Stronger strands", body: "Hair feels thicker and less fragile at the root." },
+      { when: "Month 4+", head: "Fuller look", body: "Density and volume improve with steady, consistent care." }
+    ]
+  };
+  const EXPECT = {
+    face: {
+      will: ["Build a simple AM/PM routine you'll actually keep", "Target your main concern with the right ingredients", "Support and strengthen your skin barrier over time"],
+      wont: ["Fix everything overnight — skin takes weeks", "Replace a dermatologist for medical skin conditions", "Work without consistency — daily use matters most"]
+    },
+    hair: {
+      will: ["Give your scalp a simple, consistent care routine", "Support weaker strands and a healthier scalp", "Improve the look of density over the months"],
+      wont: ["Regrow hair in days — it takes months", "Replace a doctor for medical hair loss", "Work if you skip days — consistency is everything"]
+    }
+  };
+
+  function inr(n) { return "₹" + Math.round(Number(n) || 0).toLocaleString("en-IN"); }
+
+  function renderExtras(data) {
+    const products = Array.isArray(data.products) ? data.products : [];
+
+    // ---- starter / 1st month kit ----
+    const kit = $("kit");
+    if (products.length >= 2) {
+      kit.hidden = false;
+      $("kit-title").textContent = category === "hair" ? "Your 1st month kit" : "Your starter kit";
+      const full = products.reduce((s, p) => s + (Number(p.price) || 0), 0);
+      const now = Math.round((full * 0.85) / 10) * 10; // 15% bundle saving, rounded
+      const pct = Math.max(1, Math.round((1 - now / full) * 100));
+      $("kit-badge").textContent = pct + "% off as a kit";
+      const wrap = $("kit-items"); wrap.innerHTML = "";
+      products.forEach((p) => {
+        const row = el("div", "kit-item");
+        const thumb = el("div", "kit-thumb");
+        if (p.image) { const im = el("img"); im.src = p.image; im.alt = p.name || ""; thumb.appendChild(im); }
+        else if (Array.isArray(p.gradient) && p.gradient.length === 2) { thumb.style.background = `linear-gradient(135deg, ${p.gradient[0]}, ${p.gradient[1]})`; }
+        row.appendChild(thumb);
+        const info = el("div", "kit-info");
+        info.appendChild(el("span", "kit-name", p.name || ""));
+        if (p.blurb) info.appendChild(el("span", "kit-blurb", p.blurb));
+        row.appendChild(info);
+        row.appendChild(el("span", "kit-price", inr(p.price)));
+        wrap.appendChild(row);
+      });
+      $("kit-was").textContent = inr(full);
+      $("kit-now").textContent = inr(now);
+      $("kit-note").textContent = `${products.length} products · one simple routine. Buy together and save ${inr(full - now)}.`;
+      const addBtn = $("kit-add");
+      addBtn.disabled = false; addBtn.textContent = "Add all to cart";
+      addBtn.onclick = () => {
+        cart += products.length; cartCountEl.textContent = String(cart);
+        addBtn.textContent = "✓ Added to cart"; addBtn.disabled = true;
+      };
+    } else kit.hidden = true;
+
+    // ---- timeline ----
+    const tl = $("timeline"), track = $("timeline-track");
+    const steps = TIMELINE[category] || TIMELINE.face;
+    if (steps && steps.length) {
+      tl.hidden = false;
+      $("timeline-title").textContent = category === "hair" ? "Your hair journey, month by month" : "What to expect, week by week";
+      track.innerHTML = "";
+      steps.forEach((s) => {
+        const card = el("div", "tl-card");
+        card.appendChild(el("span", "tl-when", s.when));
+        card.appendChild(el("span", "tl-head", s.head));
+        card.appendChild(el("span", "tl-body", s.body));
+        track.appendChild(card);
+      });
+    } else tl.hidden = true;
+
+    // ---- what this will & won't do ----
+    const exp = $("expect");
+    const ex = EXPECT[category] || EXPECT.face;
+    if (ex) {
+      exp.hidden = false;
+      const will = $("expect-will"), wont = $("expect-wont");
+      will.innerHTML = ""; wont.innerHTML = "";
+      ex.will.forEach((t) => will.appendChild(el("li", null, t)));
+      ex.wont.forEach((t) => wont.appendChild(el("li", null, t)));
+    } else exp.hidden = true;
   }
 
   // ---- lead capture ----

@@ -289,3 +289,50 @@ body {
 .upload-box { width: 100%; aspect-ratio: 4 / 3; max-height: 360px; border-radius: var(--radius); border: 1.5px dashed var(--line); background: #f4f7f4; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 14px; }
 .upload-preview { width: 100%; height: 100%; object-fit: cover; }
 .upload-placeholder { color: var(--ink-soft); font-size: 14px; }
+
+/* ---------- 1st month kit ---------- */
+.kit { margin-top: 30px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); padding: 20px; box-shadow: var(--shadow); }
+.kit-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.kit-head .section-h { margin: 0; }
+.kit-badge { flex: none; background: var(--sage); color: #fff; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 999px; letter-spacing: 0.02em; }
+.kit-items { display: flex; flex-direction: column; }
+.kit-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.kit-item:last-child { border-bottom: 0; }
+.kit-thumb { flex: none; width: 52px; height: 52px; border-radius: 12px; background: var(--mist); overflow: hidden; }
+.kit-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.kit-info { flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.kit-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+.kit-blurb { font-size: 13px; color: var(--ink-soft); }
+.kit-price { flex: none; font-weight: 600; color: var(--ink); }
+.kit-total { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+.kit-total-prices { display: flex; align-items: baseline; gap: 10px; }
+.kit-was { color: var(--ink-soft); text-decoration: line-through; font-size: 15px; }
+.kit-now { font-size: 26px; font-weight: 800; color: var(--ink); }
+.kit-total .primary-btn { width: auto; flex: 1; min-width: 180px; margin: 0; }
+.kit-note { margin: 12px 0 0; font-size: 13px; color: var(--ink-soft); }
+
+/* ---------- timeline ---------- */
+.timeline { margin-top: 30px; }
+.timeline-track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.tl-card { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.tl-when { font-size: 12px; font-weight: 700; color: var(--sage); text-transform: uppercase; letter-spacing: 0.04em; }
+.tl-head { font-weight: 600; font-size: 15px; color: var(--ink); }
+.tl-body { font-size: 13px; color: var(--ink-soft); line-height: 1.45; }
+.timeline-note { margin-top: 12px; font-size: 13px; color: var(--ink-soft); text-align: center; }
+@media (max-width: 760px) { .timeline-track { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 440px) { .timeline-track { grid-template-columns: 1fr; } }
+
+/* ---------- what this will & won't do ---------- */
+.expect { margin-top: 30px; }
+.expect-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.expect-col { border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; }
+.expect-will { background: rgba(76, 107, 90, 0.07); }
+.expect-wont { background: rgba(22, 36, 31, 0.03); }
+.expect-label { display: inline-block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+.expect-will .expect-label { color: var(--sage-deep); }
+.expect-wont .expect-label { color: var(--ink-soft); }
+.expect-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.expect-col li { position: relative; padding-left: 24px; font-size: 14px; color: var(--ink); line-height: 1.4; }
+.expect-will li::before { content: "✓"; position: absolute; left: 0; color: var(--sage); font-weight: 800; }
+.expect-wont li::before { content: "✕"; position: absolute; left: 0; color: #b06a5e; font-weight: 800; }
+@media (max-width: 560px) { .expect-cols { grid-template-columns: 1fr; } }

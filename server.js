@@ -98,7 +98,7 @@ function buildVerdict(category, answers, f) {
   if (/several years/.test(dur)) stage += 1;
   else if (/year/.test(dur)) stage += 1;
   else if (/just started|under a month/.test(dur)) stage -= 1;
-  const concernCount = (answers.concerns || "").split(",").map((s) => s.trim()).filter(Boolean).length;
+  const concernCount = (Array.isArray(answers.concerns) ? answers.concerns : String(answers.concerns || "").split(",")).map((s) => String(s).trim()).filter(Boolean).length;
   if (concernCount >= 3) stage += 1;
   stage = Math.max(1, Math.min(5, stage));
 
