@@ -95,9 +95,13 @@
       var rows = leads.map(function(l){
         var when = new Date(l.at).toLocaleString();
         var prods = (l.products || []).map(function(p){ return '<span class="tag">' + esc(p) + "</span>"; }).join(" ");
+        var contact = '<span class="email">' + esc(l.name || "—") + "</span>" +
+          (l.age ? " · " + esc(l.age) + "y" : "") +
+          (l.phone ? "<br><span class='muted'>" + esc(l.phone) + "</span>" : "") +
+          "<br><span class='muted'>" + esc(l.email) + "</span>";
         return "<tr>" +
           "<td>" + esc(when) + "</td>" +
-          '<td class="email">' + esc(l.email) + (l.name ? "<br><span class='muted'>" + esc(l.name) + "</span>" : "") + "</td>" +
+          "<td>" + contact + "</td>" +
           "<td>" + esc(l.category) + "<br><span class='muted'>" + esc(l.profile) + "</span></td>" +
           "<td>" + esc(l.concerns) + "<br><span class='muted'>" + esc(l.duration) + (l.severity ? " · " + esc(l.severity) : "") + "</span></td>" +
           "<td>" + prods + "</td>" +

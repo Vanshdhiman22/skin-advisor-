@@ -61,7 +61,7 @@ function hydrateGroups(rawGroups, category) {
 
 // ---- concern flags ----
 function flags(category, answers) {
-  const t = [answers.type, answers.scalp, answers.concerns, answers.goal].filter(Boolean).join(" ").toLowerCase();
+  const t = [answers.condition, answers.type, answers.scalp, answers.concerns, answers.goal].filter(Boolean).join(" ").toLowerCase();
   return {
     oily: /oily|oil|greasy|shine/.test(t), dry: /dry|flaky|tight/.test(t),
     sensitive: /sensitive|redness|irritat/.test(t), combination: /combination/.test(t),
@@ -286,6 +286,8 @@ app.post("/api/lead", (req, res) => {
     at: new Date().toISOString(),
     category: b.category === "hair" ? "hair" : "face",
     name: (b.name || "").toString().slice(0, 80),
+    age: (b.age || "").toString().slice(0, 4),
+    phone: (b.phone || "").toString().slice(0, 24),
     email: email.slice(0, 160),
     profile: b.profile && b.profile.type ? String(b.profile.type).slice(0, 120) : "",
     tags: Array.isArray(b.tags) ? b.tags.slice(0, 6).map(String) : [],

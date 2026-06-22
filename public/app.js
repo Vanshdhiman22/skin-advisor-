@@ -14,6 +14,8 @@
 
   const QUESTIONS = {
     face: [
+      { key: "condition", type: "single", q: "What best describes your main skin concern?",
+        options: ["Acne / breakouts", "Dryness & flaking", "Oiliness & shine", "Redness & sensitivity", "Dark spots & uneven tone", "Fine lines & ageing", "Just want a good routine"] },
       { key: "type", type: "single", q: "What's your skin like most days?", options: ["Oily", "Dry", "Combination", "Sensitive", "Not sure"] },
       { key: "concerns", type: "multi", q: "What would you like to work on?", help: "Pick all that apply.",
         options: ["Acne / breakouts", "Excess oil", "Dryness", "Redness / sensitivity", "Dark spots", "Fine lines", "Dullness", "Large pores"] },
@@ -28,6 +30,8 @@
       { key: "goal", type: "single", q: "What's your main goal?", options: ["Clear breakouts", "Calm & soothe", "Brighten & even tone", "Smooth fine lines", "A simple daily routine"] }
     ],
     hair: [
+      { key: "condition", type: "single", q: "What best describes your main scalp/hair concern?",
+        options: ["Dandruff & flakes", "Hair fall / thinning", "Dry & frizzy", "Oily scalp", "Itchy / irritated scalp", "Dull, lifeless hair", "Just want a good routine"] },
       { key: "scalp", type: "single", q: "What's your scalp like?", options: ["Oily", "Dry", "Sensitive", "Normal", "Not sure"] },
       { key: "concerns", type: "multi", q: "What would you like to work on?", help: "Pick all that apply.",
         options: ["Dandruff / flakes", "Hair fall / thinning", "Itchy scalp", "Frizz / dryness", "Oily roots", "Dullness", "Lack of volume"] },
@@ -119,8 +123,7 @@
   function openCategory(cat) {
     category = cat; answers = {}; detected = null; scanImage = null; photoValid = false;
     language = $("lang") ? $("lang").value : "English";
-    $("capture-btn").textContent = "Add photo & continue";
-    show("scan"); startCamera();
+    startIntake();
   }
   async function analyzeAndContinue(image) {
     if (busy) return; busy = true;
@@ -140,9 +143,9 @@
     } catch (e) {}
     await minDelay;
     if (cam) cam.classList.remove("scanning");
-    if (btn) { btn.disabled = false; btn.textContent = "Add photo & continue"; }
+    if (btn) { btn.disabled = false; btn.textContent = "Add photo & see my plan"; }
     busy = false;
-    stopCamera(); startIntake();
+    stopCamera(); submitConsult();
   }
 
   function runScan() {
@@ -213,7 +216,10 @@
       };
     }
   }
-  function advance() { if (stepIndex < questions.length - 1) { stepIndex++; renderStep(); } else submitConsult(); }
+  function advance() {
+    if (stepIndex < questions.length - 1) { stepIndex++; renderStep(); }
+    else { $("capture-btn").textContent = "Add photo & see my plan"; show("scan"); startCamera(); }
+  }
   function stepBack() { if (stepIndex > 0) { stepIndex--; renderStep(); } else show("home"); }
 
   async function submitConsult() {
@@ -292,21 +298,27 @@
   function resetLead() {
     const form = $("lead-form"); if (!form) return;
     form.hidden = false; $("lead-done").hidden = true; $("lead-error").hidden = true;
-    $("lead-name").value = ""; $("lead-email").value = ""; $("lead-consent").checked = false;
+    $("lead-name").value = ""; $("lead-age").value = ""; $("lead-phone").value = ""; $("lead-email").value = ""; $("lead-consent").checked = false;
     const b = $("lead-submit"); b.disabled = false; b.textContent = "Save my routine";
   }
   async function submitLead() {
+    const name = $("lead-name").value.trim();
+    const age = $("lead-age").value.trim();
+    const phone = $("lead-phone").value.trim();
     const email = $("lead-email").value.trim();
     const consent = $("lead-consent").checked;
     const err = $("lead-error");
+    if (!name) { err.hidden = false; err.textContent = "Please enter your name."; return; }
+    if (!/^\d{1,3}$/.test(age) || +age < 1 || +age > 120) { err.hidden = false; err.textContent = "Please enter a valid age."; return; }
+    if (!/^[+\d][\d\s-]{6,}$/.test(phone)) { err.hidden = false; err.textContent = "Please enter a valid phone number."; return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.hidden = false; err.textContent = "Please enter a valid email."; return; }
-    if (!consent) { err.hidden = false; err.textContent = "Please tick the box so we can save your routine."; return; }
+    if (!consent) { err.hidden = false; err.textContent = "Please tick the box so we can save your details."; return; }
     err.hidden = true;
     const btn = $("lead-submit"); btn.disabled = true; btn.textContent = "Saving…";
     const names = [];
     ((lastResultData && lastResultData.routine) || []).forEach((g) => (g.steps || []).forEach((s) => { if (!names.includes(s.product.name)) names.push(s.product.name); }));
     const payload = {
-      category, name: $("lead-name").value.trim(), email, consent: true,
+      category, name, age, phone, email, consent: true,
       profile: (lastResultData && lastResultData.profile) || null,
       tags: (lastResultData && lastResultData.profile && lastResultData.profile.tags) || [],
       concerns: answers.concerns || answers.scalp || "",
@@ -331,10 +343,10 @@
     const file = e.target.files && e.target.files[0];
     e.target.value = "";
     if (!file || busy) return;
-    fileToDataURL(file, (dataURL) => { if (dataURL) analyzeAndContinue(dataURL); else { stopCamera(); startIntake(); } });
+    fileToDataURL(file, (dataURL) => { if (dataURL) analyzeAndContinue(dataURL); else { stopCamera(); submitConsult(); } });
   });
-  $("skip-scan").addEventListener("click", () => { stopCamera(); startIntake(); });
-  $("scan-back").addEventListener("click", () => { stopCamera(); show("home"); });
+  $("skip-scan").addEventListener("click", () => { stopCamera(); submitConsult(); });
+  $("scan-back").addEventListener("click", () => { stopCamera(); show("intake"); renderStep(); });
   $("intake-back").addEventListener("click", stepBack);
   $("result-back").addEventListener("click", () => show("home"));
   $("save-pdf").addEventListener("click", () => window.print());
