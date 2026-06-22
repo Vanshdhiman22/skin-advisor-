@@ -88,6 +88,29 @@ function buildSnapshot(category, f) {
   ];
 }
 
+// ---- assessment verdict: stage (1-5) + level, computed from the actual answers ----
+function buildVerdict(category, answers, f) {
+  const sev = (answers.severity || "").toLowerCase();
+  const dur = (answers.duration || "").toLowerCase();
+  const level = /significant|severe/.test(sev) ? "Significant" : /mild/.test(sev) ? "Mild" : "Moderate";
+
+  let stage = /significant|severe/.test(sev) ? 4 : /mild/.test(sev) ? 2 : 3;
+  if (/several years/.test(dur)) stage += 1;
+  else if (/year/.test(dur)) stage += 1;
+  else if (/just started|under a month/.test(dur)) stage -= 1;
+  const concernCount = (answers.concerns || "").split(",").map((s) => s.trim()).filter(Boolean).length;
+  if (concernCount >= 3) stage += 1;
+  stage = Math.max(1, Math.min(5, stage));
+
+  let label;
+  if (category === "hair") {
+    label = f.hairfall ? "Hair fall" : f.dand ? "Dandruff" : f.dry ? "Dry scalp" : f.oily ? "Oily scalp" : f.itch ? "Scalp irritation" : "Scalp health";
+  } else {
+    label = f.acne ? "Breakouts" : f.fine ? "Skin ageing" : f.dark ? "Uneven tone" : f.sensitive ? "Sensitivity" : f.dry ? "Dryness" : f.oily ? "Excess oil" : "Skin health";
+  }
+  return { label, stage, stageMax: 5, level };
+}
+
 // ---- rule-based routine (fallback) ----
 function buildRoutine(category, f) {
   if (category === "hair") {
@@ -223,6 +246,7 @@ ${catalogText(category)}`;
       products: flat.length ? flat : fb.products,
       lifestyle: Array.isArray(p.lifestyle) && p.lifestyle.length ? p.lifestyle : fb.lifestyle,
       seeProfessional: p.seeProfessional || (flagPro ? proSentence(category) : ""),
+      verdict: buildVerdict(category, answers, f),
       language
     });
   } catch (e) { console.error("consult:", e.message); return res.json(fallbackConsult(category, answers, detected, f, flagPro)); }
@@ -246,6 +270,7 @@ function fallbackConsult(category, answers, detected, f, flagPro) {
     products,
     lifestyle: tips.slice(0, 4),
     seeProfessional: flagPro ? proSentence(category) : "",
+    verdict: buildVerdict(category, answers, f),
     language: "English"
   };
 }

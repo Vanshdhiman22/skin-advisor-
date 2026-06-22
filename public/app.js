@@ -230,6 +230,14 @@
     cart = 0; cartCountEl.textContent = "0";
     lastResultData = data;
     resetLead();
+    const verdictEl = $("verdict");
+    const v = data.verdict;
+    if (v && v.stage && v.label) {
+      verdictEl.hidden = false;
+      $("verdict-title").textContent = `${v.label} — Stage ${v.stage} of ${v.stageMax}`;
+      $("verdict-fill").style.width = Math.round((v.stage / v.stageMax) * 100) + "%";
+      $("verdict-meta").textContent = `Severity: ${v.level}`;
+    } else verdictEl.hidden = true;
     const profile = $("profile");
     const photo = $("profile-photo");
     if (data.profile && (data.profile.type || (data.profile.tags || []).length)) {

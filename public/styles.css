@@ -270,3 +270,17 @@ body {
 .lead-done { font-size: 15px; color: var(--sage-deep); font-weight: 600; margin: 0; }
 
 @media print { .lead { display: none !important; } }
+
+/* ---------- assessment verdict (hero) ---------- */
+.verdict { border-radius: var(--radius); padding: 22px 24px; background: linear-gradient(150deg, #3a5446, #4c6b5a); color: #fff; box-shadow: var(--shadow); margin-bottom: 18px; }
+.verdict-eyebrow { display: block; text-transform: uppercase; letter-spacing: 0.14em; font-size: 11px; font-weight: 600; opacity: 0.85; margin-bottom: 8px; }
+.verdict-title { font-family: "Fraunces", serif; font-weight: 600; font-size: 26px; margin: 0 0 14px; line-height: 1.15; }
+.verdict-bar { height: 8px; background: rgba(255,255,255,0.25); border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
+.verdict-fill { display: block; height: 100%; background: #fff; border-radius: 999px; transition: width 0.7s ease; }
+.verdict-meta { font-size: 13.5px; font-weight: 500; opacity: 0.92; }
+
+@media print {
+  .verdict { background: none !important; color: var(--ink) !important; border: 1px solid var(--line); }
+  .verdict-bar { background: var(--mist) !important; }
+  .verdict-fill { background: var(--sage) !important; }
+}
