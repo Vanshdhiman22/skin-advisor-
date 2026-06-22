@@ -1,0 +1,12 @@
+{
+  "name": "skin-advisor",
+  "version": "0.1.0",
+  "description": "An AI skin advisor demo for skincare e-commerce stores.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

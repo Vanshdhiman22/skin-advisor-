@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dewleaf — Skin &amp; Scalp Consultation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span> Dewleaf</div>
+    <nav class="nav"><a href="#">Shop</a><a href="#">Bestsellers</a><a href="#">About</a></nav>
+    <button class="cart" type="button">Cart <span class="cart-count" id="cart-count">0</span></button>
+  </header>
+
+  <main class="stage">
+
+    <!-- HOME -->
+    <section class="view view-home" id="view-home">
+      <p class="eyebrow">Personal consultation</p>
+      <h1 class="headline">A skin expert,<br /><em>available any time.</em></h1>
+      <p class="sub">Answer a few questions, add a quick photo if you like, and get a routine built around your skin or scalp — not everyone else's.</p>
+      <div class="choices">
+        <button class="choice" type="button" data-category="face">
+          <span class="choice-emoji" aria-hidden="true">✨</span>
+          <span class="choice-title">Face &amp; Skin</span>
+          <span class="choice-desc">A full skin consultation &amp; routine</span>
+          <span class="choice-go">Start →</span>
+        </button>
+        <button class="choice" type="button" data-category="hair">
+          <span class="choice-emoji" aria-hidden="true">🌿</span>
+          <span class="choice-title">Scalp &amp; Hair</span>
+          <span class="choice-desc">A full scalp &amp; hair consultation</span>
+          <span class="choice-go">Start →</span>
+        </button>
+      </div>
+      <div class="lang-row">
+        <label for="lang">Answer me in</label>
+        <select id="lang">
+          <option>English</option><option>Hindi</option><option>Spanish</option>
+          <option>French</option><option>German</option><option>Portuguese</option>
+          <option>Arabic</option><option>Mandarin</option><option>Japanese</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- SCAN (optional) -->
+    <section class="view view-scan" id="view-scan" hidden>
+      <button class="back" id="scan-back" type="button">← Back</button>
+      <h2 class="scan-title">Quick photo (optional)</h2>
+      <p class="scan-hint">A photo helps the read — or skip it and just answer the questions.</p>
+      <div class="camera">
+        <video id="video" playsinline muted></video>
+        <div class="reticle" aria-hidden="true"></div>
+        <div class="scanline" id="scanline" aria-hidden="true"></div>
+        <div class="camera-msg" id="camera-msg" hidden></div>
+      </div>
+      <canvas id="canvas" hidden></canvas>
+      <button class="primary-btn" id="capture-btn" type="button">Scan &amp; continue</button>
+      <input type="file" id="upload-input" accept="image/*" hidden />
+      <button class="primary-btn ghost" id="upload-photo" type="button">⤒ Upload a photo instead</button>
+      <button class="link-quiet" id="skip-scan" type="button">Skip the photo, just ask me questions →</button>
+      <p class="privacy">🔒 Your photo is analysed once and never stored.</p>
+    </section>
+
+    <!-- INTAKE -->
+    <section class="view view-intake" id="view-intake" hidden>
+      <button class="back" id="intake-back" type="button">← Back</button>
+      <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+      <div class="step">
+        <h2 class="step-q" id="step-q"></h2>
+        <p class="step-help" id="step-help" hidden></p>
+        <div class="step-options" id="step-options"></div>
+        <input class="step-input" id="step-input" type="text" hidden />
+      </div>
+      <button class="primary-btn" id="step-next" type="button" hidden>Next</button>
+      <p class="step-count" id="step-count"></p>
+    </section>
+
+    <!-- LOADING -->
+    <section class="view view-loading" id="view-loading" hidden>
+      <div class="loader" aria-hidden="true"></div>
+      <p class="loading-text">Building your personal routine…</p>
+    </section>
+
+    <!-- RESULT -->
+    <section class="view view-result" id="view-result" hidden>
+      <div class="result-top">
+        <button class="back" id="result-back" type="button">← Start over</button>
+        <button class="save-btn" id="save-pdf" type="button">⤓ Save as PDF</button>
+      </div>
+
+      <div class="profile" id="profile" hidden>
+        <span class="profile-eyebrow" id="profile-eyebrow">Your profile</span>
+        <h2 class="profile-type" id="profile-type"></h2>
+        <div class="profile-tags" id="profile-tags"></div>
+      </div>
+
+      <div class="snapshot" id="snapshot" hidden>
+        <h3 class="section-h" id="snapshot-h">Your snapshot</h3>
+        <div class="bars" id="bars"></div>
+      </div>
+
+      <p class="result-summary" id="result-summary"></p>
+      <div class="pro-note" id="pro-note" hidden></div>
+
+      <h3 class="section-h">Your routine</h3>
+      <div class="routine" id="routine"></div>
+
+      <div class="lifestyle" id="lifestyle" hidden>
+        <h3 class="section-h">A few habits that'll help</h3>
+        <ul class="lifestyle-list" id="lifestyle-list"></ul>
+      </div>
+
+      <div class="lead" id="lead">
+        <div id="lead-form">
+          <h3 class="section-h">Save your routine</h3>
+          <p class="lead-sub">Drop your email and we'll keep your routine handy and check in on your progress.</p>
+          <input class="lead-input" id="lead-name" type="text" placeholder="First name (optional)" autocomplete="given-name" />
+          <input class="lead-input" id="lead-email" type="email" placeholder="you@email.com" autocomplete="email" />
+          <label class="lead-consent"><input type="checkbox" id="lead-consent" /> <span>I'm happy for my routine to be saved and to be contacted about it.</span></label>
+          <p class="lead-error" id="lead-error" hidden></p>
+          <button class="primary-btn" id="lead-submit" type="button">Save my routine</button>
+        </div>
+        <p class="lead-done" id="lead-done" hidden>✓ All set — your routine is saved. You can download the PDF above too.</p>
+      </div>
+
+      <p class="medical-note">This is a cosmetic guide to help you choose products — not a medical diagnosis.</p>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span>Dewleaf</span>
+    <span class="foot-tag">AI skincare &amp; haircare consultation</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

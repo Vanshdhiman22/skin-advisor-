@@ -1,0 +1,12 @@
+# Dependencies (Render reinstalls these)
+node_modules/
+
+# Secrets — never commit your API key
+.env
+
+# Saved leads contain personal data — keep them out of the repo
+data/leads.json
+
+# Misc
+*.log
+.DS_Store

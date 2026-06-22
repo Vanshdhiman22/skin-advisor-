@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dewleaf — Leads</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#16241f; --soft:#46594f; --sage:#4c6b5a; --deep:#324c3d; --line:rgba(22,36,31,.1); --mist:#e6eee8; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Inter",system-ui,sans-serif; color:var(--ink); background:#f2f5f1; }
+    .wrap { max-width:980px; margin:0 auto; padding:32px 20px 60px; }
+    h1 { font-family:"Fraunces",serif; font-weight:600; font-size:30px; margin:0 0 4px; }
+    .muted { color:var(--soft); font-size:14px; }
+    .login { max-width:360px; margin:80px auto; background:#fff; border:1px solid var(--line); border-radius:18px; padding:26px; box-shadow:0 18px 50px -22px rgba(22,36,31,.35); }
+    .login h1 { font-size:24px; }
+    input { width:100%; border:1px solid var(--line); border-radius:11px; padding:12px 14px; font:inherit; font-size:15px; margin:14px 0; outline:none; }
+    input:focus { border-color:var(--sage); box-shadow:0 0 0 3px rgba(76,107,90,.14); }
+    button { border:none; background:var(--deep); color:#fff; border-radius:11px; padding:12px 18px; font:inherit; font-size:15px; font-weight:600; cursor:pointer; }
+    button:hover { background:var(--ink); }
+    .err { color:#b4452f; font-size:13px; margin:6px 0 0; }
+    .cards { display:flex; flex-wrap:wrap; gap:14px; margin:22px 0 26px; }
+    .card { flex:1; min-width:150px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+    .card .n { font-family:"Fraunces",serif; font-size:30px; font-weight:600; color:var(--deep); }
+    .card .l { font-size:12.5px; color:var(--soft); text-transform:uppercase; letter-spacing:.1em; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { background:var(--mist); color:var(--deep); border-radius:999px; padding:6px 13px; font-size:13px; font-weight:500; }
+    table { width:100%; border-collapse:collapse; background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-top:18px; }
+    th, td { text-align:left; padding:11px 13px; font-size:13.5px; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { background:#eef5f0; font-weight:600; color:var(--deep); }
+    tr:last-child td { border-bottom:none; }
+    .email { font-weight:600; }
+    .tag { display:inline-block; background:var(--mist); border-radius:6px; padding:1px 7px; font-size:11.5px; margin:1px 2px 1px 0; }
+    .empty { text-align:center; color:var(--soft); padding:50px; }
+    h2 { font-family:"Fraunces",serif; font-weight:600; font-size:18px; margin:24px 0 10px; }
+  </style>
+</head>
+<body>
+  <!-- login -->
+  <div class="login" id="login">
+    <h1>Leads</h1>
+    <p class="muted">Enter the owner password to view consultations.</p>
+    <input type="password" id="pw" placeholder="Password" />
+    <button id="go" type="button">View leads</button>
+    <p class="err" id="err" hidden></p>
+  </div>
+
+  <!-- dashboard -->
+  <div class="wrap" id="dash" hidden>
+    <h1>Your leads</h1>
+    <p class="muted">People who finished a consultation and asked to be contacted.</p>
+
+    <div class="cards" id="cards"></div>
+
+    <h2>Most common concerns</h2>
+    <div class="chips" id="concerns"></div>
+
+    <h2>All leads</h2>
+    <div id="table"></div>
+  </div>
+
+  <script>
+    var KEY = "";
+    function el(id){ return document.getElementById(id); }
+    function esc(s){ return String(s||"").replace(/[&<>"]/g, function(c){ return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"})[c]; }); }
+
+    async function load() {
+      const pw = el("pw").value.trim();
+      if (!pw) return;
+      try {
+        const res = await fetch("/api/leads", { headers: { "x-owner-key": pw } });
+        if (res.status === 401) { el("err").hidden = false; el("err").textContent = "Wrong password."; return; }
+        const data = await res.json();
+        KEY = pw;
+        render(data);
+        el("login").hidden = true; el("dash").hidden = false;
+      } catch (e) {
+        el("err").hidden = false; el("err").textContent = "Could not load — is the server running?";
+      }
+    }
+
+    function render(d) {
+      const cards = el("cards");
+      const face = (d.byCategory && d.byCategory.face) || 0;
+      const hair = (d.byCategory && d.byCategory.hair) || 0;
+      cards.innerHTML =
+        card(d.total, "Total leads") + card(face, "Face & skin") + card(hair, "Scalp & hair");
+
+      el("concerns").innerHTML = (d.topConcerns || []).length
+        ? d.topConcerns.map(function(c){ return '<span class="chip">' + esc(c[0]) + " · " + c[1] + "</span>"; }).join("")
+        : '<span class="muted">No data yet.</span>';
+
+      const leads = d.leads || [];
+      if (!leads.length) { el("table").innerHTML = '<div class="empty">No leads yet — they\'ll appear here as customers finish a consultation.</div>'; return; }
+      var rows = leads.map(function(l){
+        var when = new Date(l.at).toLocaleString();
+        var prods = (l.products || []).map(function(p){ return '<span class="tag">' + esc(p) + "</span>"; }).join(" ");
+        return "<tr>" +
+          "<td>" + esc(when) + "</td>" +
+          '<td class="email">' + esc(l.email) + (l.name ? "<br><span class='muted'>" + esc(l.name) + "</span>" : "") + "</td>" +
+          "<td>" + esc(l.category) + "<br><span class='muted'>" + esc(l.profile) + "</span></td>" +
+          "<td>" + esc(l.concerns) + "<br><span class='muted'>" + esc(l.duration) + (l.severity ? " · " + esc(l.severity) : "") + "</span></td>" +
+          "<td>" + prods + "</td>" +
+        "</tr>";
+      }).join("");
+      el("table").innerHTML = "<table><thead><tr><th>When</th><th>Contact</th><th>Type</th><th>Concern</th><th>Suggested products</th></tr></thead><tbody>" + rows + "</tbody></table>";
+    }
+    function card(n, l){ return '<div class="card"><div class="n">' + n + '</div><div class="l">' + l + "</div></div>"; }
+
+    el("go").addEventListener("click", load);
+    el("pw").addEventListener("keydown", function(e){ if (e.key === "Enter") load(); });
+  </script>
+</body>
+</html>
