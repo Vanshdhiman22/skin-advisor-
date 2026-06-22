@@ -23,7 +23,8 @@
       { key: "routine", type: "single", q: "What does your current routine look like?", options: ["Nothing yet", "Just cleanse & moisturise", "A few products", "A full routine"] },
       { key: "lifestyle", type: "multi", storeKeys: true, optional: true, q: "Any of these sound like you?", help: "Optional — pick any that apply.",
         options: [{ label: "Low water intake", value: "lowwater" }, { label: "Poor sleep", value: "poorsleep" }, { label: "High stress", value: "stress" }, { label: "Lots of sugar / dairy", value: "diet" }, { label: "Lots of sun exposure", value: "sun" }] },
-      { key: "allergies", type: "text", q: "Anything that irritates your skin?", help: "Allergies or ingredients to avoid — or just write 'none'.", placeholder: "e.g. fragrance, or 'none'" },
+      { key: "allergies", type: "multi", optional: true, q: "Anything that irritates your skin?", help: "Pick any that apply — or tap Next to skip.",
+        options: ["Fragrance", "Alcohol / drying ingredients", "Strong actives (acids, retinol)", "Sensitive to many products", "Nothing I know of"] },
       { key: "goal", type: "single", q: "What's your main goal?", options: ["Clear breakouts", "Calm & soothe", "Brighten & even tone", "Smooth fine lines", "A simple daily routine"] }
     ],
     hair: [
