@@ -132,6 +132,7 @@
         const res = await fetch("/api/analyze", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image, category }) });
         const data = await res.json();
         if (data && data.profile) detected = data.profile;
+        else showToast("Couldn't read that photo clearly — continuing with your answers.");
       }
     } catch (e) {}
     await minDelay;
