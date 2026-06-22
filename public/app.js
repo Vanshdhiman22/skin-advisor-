@@ -10,7 +10,7 @@
 
   let category = "face", answers = {}, detected = null, language = "English";
   let questions = [], stepIndex = 0, multi = new Set();
-  let cart = 0, stream = null, cameraReady = false, busy = false, lastResultData = null;
+  let cart = 0, stream = null, cameraReady = false, busy = false, lastResultData = null, scanImage = null;
 
   const QUESTIONS = {
     face: [
@@ -116,13 +116,14 @@
 
   // ---- flow ----
   function openCategory(cat) {
-    category = cat; answers = {}; detected = null;
+    category = cat; answers = {}; detected = null; scanImage = null;
     language = $("lang") ? $("lang").value : "English";
     $("capture-btn").textContent = "Scan & continue";
     show("scan"); startCamera();
   }
   async function analyzeAndContinue(image) {
     if (busy) return; busy = true;
+    scanImage = image || null;
     const btn = $("capture-btn"), cam = document.querySelector(".camera");
     if (btn) { btn.disabled = true; btn.textContent = "Analysing…"; }
     if (cam) cam.classList.add("scanning");
@@ -226,13 +227,16 @@
     lastResultData = data;
     resetLead();
     const profile = $("profile");
+    const photo = $("profile-photo");
     if (data.profile && (data.profile.type || (data.profile.tags || []).length)) {
       profile.hidden = false;
       $("profile-eyebrow").textContent = category === "hair" ? "Your scalp & hair" : "Your skin";
       $("profile-type").textContent = data.profile.type || "";
       const tags = $("profile-tags"); tags.innerHTML = "";
       (data.profile.tags || []).forEach((t) => tags.appendChild(el("span", "tag", t)));
-    } else profile.hidden = true;
+      if (scanImage && detected) { photo.src = scanImage; photo.hidden = false; }
+      else { photo.hidden = true; photo.removeAttribute("src"); }
+    } else { profile.hidden = true; photo.hidden = true; }
 
     const snap = $("snapshot");
     if (Array.isArray(data.snapshot) && data.snapshot.length) {

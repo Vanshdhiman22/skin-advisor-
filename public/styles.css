@@ -78,7 +78,7 @@ body {
   position: relative; width: 100%; aspect-ratio: 4 / 3; border-radius: var(--radius);
   overflow: hidden; background: #14171a; box-shadow: var(--shadow); border: 1px solid var(--line);
 }
-#video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
+#video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; filter: brightness(1.08) contrast(1.03); }
 .reticle {
   position: absolute; inset: 14% 22%; border: 2px dashed rgba(255,255,255,0.6);
   border-radius: 48% 48% 46% 46%; pointer-events: none;
@@ -107,9 +107,12 @@ body {
 
 /* ---------- result ---------- */
 .profile {
+  display: flex; align-items: center; gap: 16px; justify-content: space-between;
   border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px;
   background: linear-gradient(160deg, #ffffff, #f3f8f4); box-shadow: var(--shadow); margin-bottom: 18px;
 }
+.profile-text { flex: 1; min-width: 0; }
+.profile-photo { width: 76px; height: 76px; border-radius: 14px; object-fit: cover; flex: none; border: 1px solid var(--line); }
 .profile-eyebrow { text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px; font-weight: 600; color: var(--sage); }
 .profile-type { font-family: "Fraunces", serif; font-weight: 600; font-size: 26px; margin: 6px 0 12px; }
 .profile-tags { display: flex; flex-wrap: wrap; gap: 8px; }

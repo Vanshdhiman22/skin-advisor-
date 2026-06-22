@@ -195,16 +195,16 @@ Use the customer's intake answers to write a caring, personal consultation and a
 RULES:
 - COSMETIC product guidance only — NOT medical advice or diagnosis. Never name diseases, never claim to treat/cure. Everyday language.
 - If the concern is long-standing (a year+) and significant, OR involves notable hair loss, set "seeProfessional" to a short kind sentence suggesting a dermatologist/trichologist.
-- Reference their actual answers so it feels personal.
-- Build the routine as ordered groups: ${groupNames}. Each step uses a product id from the CATALOG and a short step word (e.g. "Cleanse", "Treat", "Protect"). Never invent products.
+- Reference their actual answers so it feels personal and expert — name their type, how long it's been going on, the severity, and any lifestyle factors, and briefly explain in plain language what you're focusing on and why.
+- Build the routine as ordered groups: ${groupNames}. Each step uses a product id from the CATALOG and a short step word (e.g. "Cleanse", "Treat", "Protect"), plus a short "note" saying when/how to use it. Never invent products.
 - "snapshot" = 3 cosmetic bars (0-100) summarising their ${thing} (friendly, not clinical).
-- Give 2-4 short lifestyle tips relevant to their answers.
+- Give 3-4 short, practical lifestyle tips relevant to their answers.
 - Write ALL text fields in ${language}.
 - Reply ONLY as JSON, no markdown:
 {
- "profile": {"type": "short label", "tags": ["tag","tag"]},
+ "profile": {"type": "short label", "tags": ["tag","tag","tag"]},
  "snapshot": [{"label":"...","value":0-100}, ...3],
- "summary": "2-3 warm personal sentences",
+ "summary": "4-6 warm, specific sentences: acknowledge what they shared, explain what you're seeing and the plan behind the routine, and end encouragingly",
  "routine": [{"title":"...","steps":[{"id":"product-id","step":"Cleanse","note":"optional short note"}]}],
  "lifestyle": ["tip","tip"],
  "seeProfessional": ""

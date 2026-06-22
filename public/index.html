@@ -51,7 +51,7 @@
     <section class="view view-scan" id="view-scan" hidden>
       <button class="back" id="scan-back" type="button">← Back</button>
       <h2 class="scan-title">Quick photo (optional)</h2>
-      <p class="scan-hint">A photo helps the read — or skip it and just answer the questions.</p>
+      <p class="scan-hint">For the clearest read, face a window or good light. Or skip it and just answer the questions.</p>
       <div class="camera">
         <video id="video" playsinline muted></video>
         <div class="reticle" aria-hidden="true"></div>
@@ -94,9 +94,12 @@
       </div>
 
       <div class="profile" id="profile" hidden>
-        <span class="profile-eyebrow" id="profile-eyebrow">Your profile</span>
-        <h2 class="profile-type" id="profile-type"></h2>
-        <div class="profile-tags" id="profile-tags"></div>
+        <div class="profile-text">
+          <span class="profile-eyebrow" id="profile-eyebrow">Your profile</span>
+          <h2 class="profile-type" id="profile-type"></h2>
+          <div class="profile-tags" id="profile-tags"></div>
+        </div>
+        <img class="profile-photo" id="profile-photo" alt="Your scan" hidden />
       </div>
 
       <div class="snapshot" id="snapshot" hidden>
