@@ -50,8 +50,8 @@
     <!-- SCAN (optional) -->
     <section class="view view-scan" id="view-scan" hidden>
       <button class="back" id="scan-back" type="button">← Back</button>
-      <h2 class="scan-title">Quick photo (optional)</h2>
-      <p class="scan-hint">For the clearest read, face a window or good light. Or skip it and just answer the questions.</p>
+      <h2 class="scan-title">Add a photo (optional)</h2>
+      <p class="scan-hint">Your photo just appears on your result — the advice itself comes from your answers. Add one, or skip straight to the questions.</p>
       <div class="camera">
         <video id="video" playsinline muted></video>
         <div class="reticle" aria-hidden="true"></div>
@@ -59,11 +59,11 @@
         <div class="camera-msg" id="camera-msg" hidden></div>
       </div>
       <canvas id="canvas" hidden></canvas>
-      <button class="primary-btn" id="capture-btn" type="button">Scan &amp; continue</button>
+      <button class="primary-btn" id="capture-btn" type="button">Add photo &amp; continue</button>
       <input type="file" id="upload-input" accept="image/*" hidden />
       <button class="primary-btn ghost" id="upload-photo" type="button">⤒ Upload a photo instead</button>
       <button class="link-quiet" id="skip-scan" type="button">Skip the photo, just ask me questions →</button>
-      <p class="privacy">🔒 Your photo is analysed once and never stored.</p>
+      <p class="privacy">🔒 Your photo isn't saved anywhere.</p>
     </section>
 
     <!-- INTAKE -->
@@ -131,7 +131,7 @@
         <p class="lead-done" id="lead-done" hidden>✓ All set — your routine is saved. You can download the PDF above too.</p>
       </div>
 
-      <p class="medical-note">This is a cosmetic guide to help you choose products — not a medical diagnosis.</p>
+      <p class="medical-note">This is a cosmetic guide based on what you told us — not a medical diagnosis.</p>
     </section>
 
   </main>

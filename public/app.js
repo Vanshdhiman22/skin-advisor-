@@ -8,7 +8,7 @@
   const cartCountEl = $("cart-count");
   const toast = $("toast");
 
-  let category = "face", answers = {}, detected = null, language = "English";
+  let category = "face", answers = {}, detected = null, language = "English", photoValid = false;
   let questions = [], stepIndex = 0, multi = new Set();
   let cart = 0, stream = null, cameraReady = false, busy = false, lastResultData = null, scanImage = null;
 
@@ -21,7 +21,7 @@
       { key: "severity", type: "single", q: "How would you describe it right now?", options: ["Mild", "Moderate", "Significant"] },
       { key: "family", type: "single", q: "Does it tend to run in your family?", help: "Some skin tendencies are hereditary — this helps tailor advice.", options: ["Yes", "No", "Not sure"] },
       { key: "routine", type: "single", q: "What does your current routine look like?", options: ["Nothing yet", "Just cleanse & moisturise", "A few products", "A full routine"] },
-      { key: "lifestyle", type: "multi", storeKeys: true, q: "Any of these sound like you?", help: "Optional — pick any that apply.",
+      { key: "lifestyle", type: "multi", storeKeys: true, optional: true, q: "Any of these sound like you?", help: "Optional — pick any that apply.",
         options: [{ label: "Low water intake", value: "lowwater" }, { label: "Poor sleep", value: "poorsleep" }, { label: "High stress", value: "stress" }, { label: "Lots of sugar / dairy", value: "diet" }, { label: "Lots of sun exposure", value: "sun" }] },
       { key: "allergies", type: "text", q: "Anything that irritates your skin?", help: "Allergies or ingredients to avoid — or just write 'none'.", placeholder: "e.g. fragrance, or 'none'" },
       { key: "goal", type: "single", q: "What's your main goal?", options: ["Clear breakouts", "Calm & soothe", "Brighten & even tone", "Smooth fine lines", "A simple daily routine"] }
@@ -35,7 +35,7 @@
       { key: "family", type: "single", q: "Does hair thinning run in your family?", help: "This helps us set the right expectations.", options: ["Yes", "No", "Not sure"] },
       { key: "washing", type: "single", q: "How often do you wash your hair?", options: ["Daily", "Every 2-3 days", "Twice a week", "Weekly"] },
       { key: "treatments", type: "single", q: "Do you heat-style or chemically treat your hair?", help: "Colouring, straightening, frequent heat, etc.", options: ["Often", "Sometimes", "Rarely"] },
-      { key: "lifestyle", type: "multi", storeKeys: true, q: "Any of these sound like you?", help: "Optional — pick any that apply.",
+      { key: "lifestyle", type: "multi", storeKeys: true, optional: true, q: "Any of these sound like you?", help: "Optional — pick any that apply.",
         options: [{ label: "High stress", value: "stress" }, { label: "Poor sleep", value: "poorsleep" }, { label: "Low-protein diet", value: "lowprotein" }, { label: "Hard water", value: "hardwater" }] },
       { key: "goal", type: "single", q: "What's your main goal?", options: ["Stop the flakes", "Reduce hair fall", "Add moisture & shine", "Add volume", "A simple care routine"] }
     ]
@@ -116,29 +116,30 @@
 
   // ---- flow ----
   function openCategory(cat) {
-    category = cat; answers = {}; detected = null; scanImage = null;
+    category = cat; answers = {}; detected = null; scanImage = null; photoValid = false;
     language = $("lang") ? $("lang").value : "English";
-    $("capture-btn").textContent = "Scan & continue";
+    $("capture-btn").textContent = "Add photo & continue";
     show("scan"); startCamera();
   }
   async function analyzeAndContinue(image) {
     if (busy) return; busy = true;
     scanImage = image || null;
+    photoValid = false;
     const btn = $("capture-btn"), cam = document.querySelector(".camera");
-    if (btn) { btn.disabled = true; btn.textContent = "Analysing…"; }
+    if (btn) { btn.disabled = true; btn.textContent = "Checking…"; }
     if (cam) cam.classList.add("scanning");
-    const minDelay = new Promise((r) => setTimeout(r, 1100));
+    const minDelay = new Promise((r) => setTimeout(r, 900));
     try {
       if (image) {
         const res = await fetch("/api/analyze", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ image, category }) });
         const data = await res.json();
-        if (data && data.profile) detected = data.profile;
-        else showToast("Couldn't read that photo clearly — continuing with your answers.");
+        if (data && data.usable) photoValid = true;
+        else { scanImage = null; showToast(category === "hair" ? "That doesn't look like a scalp/hair photo — continuing with your answers." : "That doesn't look like a face photo — continuing with your answers."); }
       }
     } catch (e) {}
     await minDelay;
     if (cam) cam.classList.remove("scanning");
-    if (btn) { btn.disabled = false; btn.textContent = "Scan & continue"; }
+    if (btn) { btn.disabled = false; btn.textContent = "Add photo & continue"; }
     busy = false;
     stopCamera(); startIntake();
   }
@@ -182,8 +183,10 @@
 
     if (q.type === "text") {
       input.hidden = false; input.value = answers[q.key] || ""; input.placeholder = q.placeholder || "Type your answer…";
-      next.hidden = false; next.textContent = "Next"; input.focus();
-      next.onclick = () => { answers[q.key] = input.value.trim(); advance(); };
+      next.textContent = "Next"; next.hidden = !input.value.trim();
+      input.oninput = () => { next.hidden = !input.value.trim(); };
+      input.focus();
+      next.onclick = () => { const v = input.value.trim(); if (!v) return; answers[q.key] = v; advance(); };
       return;
     }
     q.options.forEach((o) => {
@@ -194,12 +197,13 @@
         const v = optValue(o);
         if (multi.has(v)) { multi.delete(v); row.classList.remove("selected"); }
         else { multi.add(v); row.classList.add("selected"); }
-        next.hidden = multi.size === 0;
+        if (!q.optional) next.hidden = multi.size === 0;
       });
       opts.appendChild(row);
     });
     if (q.type === "multi") {
       next.textContent = "Next";
+      next.hidden = q.optional ? false : true; // required concerns need a pick; optional lifestyle can be skipped
       next.onclick = () => {
         const chosen = q.options.filter((o) => multi.has(optValue(o)));
         answers[q.key] = chosen.map(optLabel).join(", ");
@@ -234,7 +238,7 @@
       $("profile-type").textContent = data.profile.type || "";
       const tags = $("profile-tags"); tags.innerHTML = "";
       (data.profile.tags || []).forEach((t) => tags.appendChild(el("span", "tag", t)));
-      if (scanImage && detected) { photo.src = scanImage; photo.hidden = false; }
+      if (scanImage && photoValid) { photo.src = scanImage; photo.hidden = false; }
       else { photo.hidden = true; photo.removeAttribute("src"); }
     } else { profile.hidden = true; photo.hidden = true; }
 

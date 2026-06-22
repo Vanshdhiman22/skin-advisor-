@@ -151,26 +151,23 @@ function fallbackChat(messages, category) {
 }
 
 // ---- scan (vision, optional) ----
+// Photo check: we ONLY verify the image really shows a face/scalp so it can be shown
+// in the result. We do NOT claim to analyse skin from a photo — the advice comes from
+// the questionnaire. (For real skin measurement, integrate a dedicated skin-analysis API.)
 app.post("/api/analyze", async (req, res) => {
   const category = req.body.category === "hair" ? "hair" : "face";
   const image = req.body.image;
-  const thing = category === "hair" ? "scalp and hair" : "facial skin";
-  if (!API_KEY || !image) return res.json({ needInput: true, category });
+  const subject = category === "hair" ? "a real human scalp or hair" : "a real human face";
+  if (!API_KEY || !image) return res.json({ usable: false, category });
   try {
-    const subject = category === "hair" ? "a real human scalp or hair" : "a real human face";
-    const system = `You are a careful COSMETIC ${thing} analysis assistant for Dewleaf.
-First, decide whether the photo clearly shows ${subject}. If it instead shows an object, a drawing, an emoji, a screenshot, a blank or blurry image, or no visible ${category === "hair" ? "scalp or hair" : "face"}, it is NOT usable.
-- If NOT usable, reply exactly: {"usable": false}
-- If usable, give a light, encouraging COSMETIC read (never a medical diagnosis, never name conditions, everyday words) and reply: {"usable": true, "profile": {"type": "short label", "observations": ["short tag", ...]}}
-Reply ONLY with the JSON, nothing else.`;
+    const system = `You only classify a photo. Decide if it clearly shows ${subject} — a genuine photo of a real person. If it shows an object, a drawing, an emoji, a screenshot, a blank or blurry image, or no visible ${category === "hair" ? "scalp or hair" : "face"}, it is not valid. Reply ONLY as JSON: {"usable": true} or {"usable": false}.`;
     const text = await callGroq(VISION_MODEL, [
       { role: "system", content: system },
-      { role: "user", content: [{ type: "text", text: `Quick cosmetic read of my ${thing} from this photo as JSON.` }, { type: "image_url", image_url: { url: image } }] }
-    ], { temperature: 0.4 });
+      { role: "user", content: [{ type: "text", text: `Is this a valid photo of ${subject}? JSON only.` }, { type: "image_url", image_url: { url: image } }] }
+    ], { temperature: 0 });
     const p = safeParse(text);
-    if (!p || p.usable === false || !p.profile) return res.json({ needInput: true, category });
-    return res.json({ profile: p.profile, category });
-  } catch (e) { console.error("analyze:", e.message); return res.json({ needInput: true, category, note: "vision_unavailable" }); }
+    return res.json({ usable: !!(p && p.usable === true), category });
+  } catch (e) { console.error("analyze:", e.message); return res.json({ usable: false, category }); }
 });
 
 // ---- detailed consultation ----
@@ -195,7 +192,7 @@ Use the customer's intake answers to write a caring, personal consultation and a
 RULES:
 - COSMETIC product guidance only — NOT medical advice or diagnosis. Never name diseases, never claim to treat/cure. Everyday language.
 - If the concern is long-standing (a year+) and significant, OR involves notable hair loss, set "seeProfessional" to a short kind sentence suggesting a dermatologist/trichologist.
-- Reference their actual answers so it feels personal and expert — name their type, how long it's been going on, the severity, and any lifestyle factors, and briefly explain in plain language what you're focusing on and why.
+- Make this UNIQUE to THIS person. In the summary, explicitly mention their stated skin/scalp type, their specific concerns, how long it has lasted, the severity, and any relevant lifestyle answers — and adapt the plan to match (gentler and simpler for mild cases or beginners; more focused for significant or long-standing ones). Avoid generic openers and don't reuse the same wording you'd give someone else.
 - Build the routine as ordered groups: ${groupNames}. Each step uses a product id from the CATALOG and a short step word (e.g. "Cleanse", "Treat", "Protect"), plus a short "note" saying when/how to use it. Never invent products.
 - "snapshot" = 3 cosmetic bars (0-100) summarising their ${thing} (friendly, not clinical).
 - Give 3-4 short, practical lifestyle tips relevant to their answers.
