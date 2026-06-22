@@ -127,7 +127,7 @@ body {
 /* product cards */
 .recs { display: flex; flex-direction: column; gap: 12px; }
 .rec { display: flex; gap: 14px; align-items: center; border: 1px solid var(--line); border-radius: 16px; padding: 13px; background: var(--paper); box-shadow: 0 8px 26px -20px rgba(22,36,31,0.4); animation: fade 0.35s ease both; }
-.rec-swatch { width: 56px; height: 56px; border-radius: 12px; flex: none; }
+.rec-swatch { width: 56px; height: 56px; border-radius: 12px; flex: none; display: flex; align-items: center; justify-content: center; }
 .rec-body { flex: 1; min-width: 0; }
 .rec-name { font-weight: 600; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; }
 .rec-price { color: var(--sage-deep); font-variant-numeric: tabular-nums; }

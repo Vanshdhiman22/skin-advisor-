@@ -48,10 +48,24 @@
   function optLabel(o) { return typeof o === "string" ? o : o.label; }
   function optValue(o) { return typeof o === "string" ? o : o.value; }
 
+  // simple, self-contained product illustrations (bottle / dropper / jar / tube) per role
+  function productArt(role) {
+    const map = { cleanser: "tube", shampoo: "bottle", conditioner: "bottle", "serum-am": "dropper", "treatment-pm": "dropper", leavein: "dropper", oil: "dropper", moisturizer: "jar", "moisturizer-pm": "jar", mask: "jar", spf: "tube" };
+    const shapes = {
+      bottle: '<rect x="8" y="9" width="8" height="11" rx="2"/><rect x="9.5" y="4.5" width="5" height="4.5" rx="1.2"/>',
+      dropper: '<rect x="8.5" y="11" width="7" height="9" rx="2"/><rect x="11.2" y="3.6" width="1.6" height="6" rx="0.8"/><circle cx="12" cy="3.3" r="1.5"/>',
+      jar: '<rect x="6" y="11" width="12" height="9" rx="2.5"/><rect x="7.2" y="7.5" width="9.6" height="3.6" rx="1.4"/>',
+      tube: '<rect x="9" y="8.5" width="6" height="11.5" rx="3"/><rect x="10" y="4.8" width="4" height="3.7" rx="1"/>'
+    };
+    return '<svg viewBox="0 0 24 24" width="30" height="30" fill="rgba(255,255,255,0.95)" xmlns="http://www.w3.org/2000/svg">' + (shapes[map[role]] || shapes.jar) + "</svg>";
+  }
+
   function stepCard(product, stepLabel) {
     const card = el("div", "rec");
     const sw = el("div", "rec-swatch");
     sw.style.background = `linear-gradient(145deg, ${product.gradient[0]}, ${product.gradient[1]})`;
+    if (product.image) { sw.style.backgroundImage = `url("${product.image}")`; sw.style.backgroundSize = "cover"; sw.style.backgroundPosition = "center"; }
+    else { sw.innerHTML = productArt(product.role); }
     const body = el("div", "rec-body");
     if (stepLabel) body.appendChild(el("span", "rec-step", stepLabel));
     const name = el("div", "rec-name");
